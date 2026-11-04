@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home - MovieMate
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+
+    <div class="container">
+
+        <h1>Find Your Next Favorite Movie 🎬</h1>
+
+        <p class="lead mt-3">
+            Discover movies based on your interests and preferences.
+        </p>
+
+        <div class="search-box">
+
+            <div class="input-group input-group-lg">
+
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Search for a movie..."
+                >
+
+                <button class="btn btn-primary">
+                    <i class="bi bi-search"></i>
+                    Search
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="container mt-5">
+
+    <h2 class="mb-4">
+        Explore Movies
+    </h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h4>🎯 Personalized</h4>
+
+                    <p>
+                        Get movie recommendations based on
+                        your interests.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h4>🔍 Search</h4>
+
+                    <p>
+                        Find movies using title, genre,
+                        language and other details.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h4>❤️ Watchlist</h4>
+
+                    <p>
+                        Save movies you want to watch later.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

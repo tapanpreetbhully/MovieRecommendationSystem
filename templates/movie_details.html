@@ -1,0 +1,207 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+{{ movie.title }} - MovieMate
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+    <div class="row">
+
+        <div class="col-md-8">
+
+            <h1>{{ movie.title }}</h1>
+
+            <p class="text-muted">
+                {{ movie.release_year }} • {{ movie.language }}
+            </p>
+
+            <hr>
+
+            <p>
+                <strong>Genre:</strong>
+                {{ movie.genre }}
+            </p>
+
+            <p>
+                <strong>Director:</strong>
+                {{ movie.director }}
+            </p>
+
+            <p>
+                <strong>Actors:</strong>
+                {{ movie.actors }}
+            </p>
+
+            <p>
+                <strong>Movie Rating:</strong>
+                ⭐ {{ movie.rating }}
+            </p>
+
+            <h4 class="mt-4">
+                Description
+            </h4>
+
+            <p>
+                {{ movie.description }}
+            </p>
+
+            <!-- User Star Rating -->
+            <div class="card shadow-sm mt-4 mb-4">
+                <div class="card-body">
+
+                    <h4 class="card-title">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        Rate This Movie
+                    </h4>
+
+                    <p class="text-muted">
+                        How many stars would you give this movie?
+                    </p>
+
+                    {% if session.get("user_id") %}
+
+                        {% if user_rating %}
+                            <p class="text-success fw-bold">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Your current rating: {{ user_rating }} / 5 ⭐
+                            </p>
+                        {% else %}
+                            <p class="text-muted">
+                                You haven't rated this movie yet.
+                            </p>
+                        {% endif %}
+
+                        <form
+                            action="{{ url_for('rate_movie', movie_id=movie_id) }}"
+                            method="POST"
+                        >
+
+                            <div class="mb-3">
+
+                                <label for="rating" class="form-label">
+                                    Select your rating
+                                </label>
+
+                                <select
+                                    name="rating"
+                                    id="rating"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option value="">Choose stars...</option>
+
+                                    <option value="1"
+                                        {% if user_rating == 1 %}selected{% endif %}>
+                                        ⭐ 1 Star
+                                    </option>
+
+                                    <option value="2"
+                                        {% if user_rating == 2 %}selected{% endif %}>
+                                        ⭐⭐ 2 Stars
+                                    </option>
+
+                                    <option value="3"
+                                        {% if user_rating == 3 %}selected{% endif %}>
+                                        ⭐⭐⭐ 3 Stars
+                                    </option>
+
+                                    <option value="4"
+                                        {% if user_rating == 4 %}selected{% endif %}>
+                                        ⭐⭐⭐⭐ 4 Stars
+                                    </option>
+
+                                    <option value="5"
+                                        {% if user_rating == 5 %}selected{% endif %}>
+                                        ⭐⭐⭐⭐⭐ 5 Stars
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <button type="submit" class="btn btn-warning">
+
+                                <i class="bi bi-star-fill"></i>
+
+                                {% if user_rating %}
+                                    Update Rating
+                                {% else %}
+                                    Submit Rating
+                                {% endif %}
+
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <p>
+                            Please log in to rate this movie.
+                        </p>
+
+                        <a href="{{ url_for('login') }}" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Login to Rate
+                        </a>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <!-- Movie Action Buttons -->
+            <div class="mt-4 d-flex flex-wrap gap-2">
+
+                <a
+                    href="{{ url_for('recommendations', movie_id=movie_id) }}"
+                    class="btn btn-primary"
+                >
+                    🤖 Get Similar Movies
+                </a>
+
+                {% if session.get("user_id") %}
+
+                    <a
+                        href="{{ url_for('add_watchlist', movie_id=movie_id) }}"
+                        class="btn btn-success"
+                    >
+                        📋 Add to Watchlist
+                    </a>
+
+                    <a
+                        href="{{ url_for('add_favourite', movie_id=movie_id) }}"
+                        class="btn btn-danger"
+                    >
+                        ❤️ Add to Favourites
+                    </a>
+
+                {% else %}
+
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary">
+                        🔐 Login to Add Watchlist
+                    </a>
+
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary">
+                        🔐 Login to Add Favourite
+                    </a>
+
+                {% endif %}
+
+                <a href="{{ url_for('movie_list') }}" class="btn btn-dark">
+                    ← Back to Movies
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

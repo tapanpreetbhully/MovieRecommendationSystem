@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}
+Recommendations - MovieMate
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="text-center mb-5">
+
+        {% if personalized %}
+
+            <h1>❤️ Your Personalized Picks</h1>
+
+            <p class="text-muted">
+                Recommended using your favourite movies and their genres,
+                directors, actors and descriptions.
+            </p>
+
+        {% else %}
+
+            <h1>
+                Movies Similar to {{ movie.title }} 🎬
+            </h1>
+
+            <p class="text-muted">
+                Based on genre, director, actors and description.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    <div class="row g-4">
+
+        {% for recommended_movie in recommendations %}
+
+        <div class="col-lg-4 col-md-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h4 class="card-title">
+                        {{ recommended_movie.title }}
+                    </h4>
+
+                    <p class="text-muted">
+                        {{ recommended_movie.release_year }}
+                    </p>
+
+                    <p>
+                        <strong>Genre:</strong>
+                        {{ recommended_movie.genre }}
+                    </p>
+
+                    <p>
+                        <strong>Language:</strong>
+                        {{ recommended_movie.language }}
+                    </p>
+
+                    <p>
+                        <strong>Rating:</strong>
+                        ⭐ {{ recommended_movie.rating }}
+                    </p>
+
+                    <p>
+                        {{ recommended_movie.description }}
+                    </p>
+
+                    <a
+                        href="/movie/{{ recommended_movie.movie_id }}"
+                        class="btn btn-primary"
+                    >
+                        View Movie
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="col-12">
+
+            <div class="alert alert-info text-center">
+
+                {% if personalized %}
+
+                    You don't have any recommendations yet.
+                    Add some movies to your Favourites ❤️ to get started.
+
+                    <br><br>
+
+                    <a href="/movies" class="btn btn-primary">
+                        Explore Movies
+                    </a>
+
+                {% else %}
+
+                    No recommendations found for this movie.
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <div class="text-center mt-5">
+
+        {% if personalized %}
+
+            <a
+                href="/favourites"
+                class="btn btn-danger"
+            >
+                ❤️ My Favourites
+            </a>
+
+        {% else %}
+
+            <a
+                href="/movies"
+                class="btn btn-secondary"
+            >
+                ← Back to Movies
+            </a>
+
+        {% endif %}
+
+        <a
+            href="/movies"
+            class="btn btn-dark"
+        >
+            Explore All Movies
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

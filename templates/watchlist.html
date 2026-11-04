@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}My Watchlist - MovieMate{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4">📋 My Watchlist</h2>
+
+    {% if movies %}
+
+    <div class="row">
+
+        {% for movie in movies %}
+
+        <div class="col-md-4 mb-4">
+
+            <div class="card h-100 shadow">
+
+                <div class="card-body">
+
+                    <h5 class="card-title">
+                        {{ movie.title }}
+                    </h5>
+
+                    <p class="text-muted">
+                        {{ movie.release_year }}
+                    </p>
+
+                    <p>
+                        <strong>Genre:</strong>
+                        {{ movie.genre }}
+                    </p>
+
+                    <p>
+                        ⭐ {{ movie.rating }}
+                    </p>
+
+                    <a
+                        href="/movie/{{ movie.movie_id }}"
+                        class="btn btn-primary"
+                    >
+                        View Movie
+                    </a>
+
+                    <a
+                        href="/remove-watchlist/{{ movie.movie_id }}"
+                        class="btn btn-danger"
+                    >
+                        Remove
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info">
+        Your watchlist is empty 🎬
+    </div>
+
+    <a href="/movies" class="btn btn-primary">
+        Explore Movies
+    </a>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
