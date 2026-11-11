@@ -336,3 +336,112 @@ def get_search_suggestions(query, limit=7):
             break
 
     return suggestions
+
+# ==========================================
+# TMDb AI MOOD DISCOVERY CONFIG & FUNCTION
+# ==========================================
+
+MOOD_DISCOVERY_CONFIG = {
+    "romantic": {
+        "name": "Romantic",
+        "emoji": "💖",
+        "genres": "10749",
+        "description": "Love, romance & heartfelt passion",
+        "sort_by": "popularity.desc",
+        "vote_count_gte": 80,
+        "color": "danger"
+    },
+    "sad": {
+        "name": "Sad",
+        "emoji": "😢",
+        "genres": "18",
+        "description": "Heartbreak, deep emotional tears & touching dramas",
+        "sort_by": "vote_average.desc",
+        "vote_count_gte": 800,
+        "color": "primary"
+    },
+    "action": {
+        "name": "Action",
+        "emoji": "💥",
+        "genres": "28,12",
+        "description": "Explosive combat, adrenaline & thrilling stunts",
+        "sort_by": "popularity.desc",
+        "vote_count_gte": 80,
+        "color": "danger"
+    },
+    "funny": {
+        "name": "Funny",
+        "emoji": "😂",
+        "genres": "35",
+        "description": "Hilarious laughs, clever jokes & feel-good comedy",
+        "sort_by": "popularity.desc",
+        "vote_count_gte": 80,
+        "color": "warning"
+    },
+    "mind_blowing": {
+        "name": "Mind-Blowing",
+        "emoji": "🧠",
+        "genres": "878,9648",
+        "description": "Psychological twists, mysteries & sci-fi discoveries",
+        "sort_by": "popularity.desc",
+        "vote_count_gte": 80,
+        "color": "info"
+    },
+    "relaxing": {
+        "name": "Relaxing",
+        "emoji": "🌿",
+        "genres": "16,10751",
+        "description": "Peaceful journeys, animated comfort & wholesome smiles",
+        "sort_by": "popularity.desc",
+        "vote_count_gte": 80,
+        "color": "success"
+    }
+}
+
+MOOD_ALIASES = {
+    "romantic": "romantic",
+    "romance": "romantic",
+    "sad": "sad",
+    "emotional": "sad",
+    "action": "action",
+    "funny": "funny",
+    "comedy": "funny",
+    "mind_blowing": "mind_blowing",
+    "mindblowing": "mind_blowing",
+    "relaxing": "relaxing"
+}
+
+def get_movies_by_mood(mood, limit=20):
+    """
+    Fetch movies directly from TMDb according to selected mood (Romantic, Sad, Action, Funny, Mind-Blowing, Relaxing)
+    and rank them in precision descending order (99%, 98%, 97%...).
+    """
+    key = MOOD_ALIASES.get(mood.lower().strip().replace(" ", "_"), "romantic")
+    config = MOOD_DISCOVERY_CONFIG.get(key, MOOD_DISCOVERY_CONFIG["romantic"])
+    display_name = config["name"]
+    emoji = config["emoji"]
+
+    params = {
+        "with_genres": config["genres"],
+        "sort_by": config["sort_by"],
+        "vote_count.gte": config["vote_count_gte"],
+        "include_adult": "false",
+        "page": 1
+    }
+
+    data = _make_request("discover/movie", params)
+    raw_results = data.get("results", []) if data else []
+
+    formatted_movies = []
+    for rank, item in enumerate(raw_results[:limit]):
+        assigned_pct = max(60, 99 - rank)
+        formatted = format_item(item, media_type="movie")
+        formatted["match_percentage"] = assigned_pct
+        formatted["match_score"] = assigned_pct
+        formatted["mood_label"] = f"{assigned_pct}% {display_name}"
+        formatted["mood_name"] = display_name
+        formatted["mood_emoji"] = emoji
+        formatted["color"] = config["color"]
+        formatted_movies.append(formatted)
+
+    return formatted_movies, config

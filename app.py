@@ -16,6 +16,7 @@ from services.tmdb_service import (
     search_tmdb,
     get_search_suggestions,
     detect_moods,
+    get_movies_by_mood,
     LANGUAGES
 )
 
@@ -303,23 +304,17 @@ def ai_discovery():
 
     if selected_mood:
         try:
-            recommendations = mood_engine.recommend_by_mood(
+            recommendations, current_mood_info = get_movies_by_mood(
                 mood=selected_mood,
                 limit=24
             )
-            current_mood_info = mood_engine.get_mood_info(selected_mood)
-
-        except ValueError:
-            flash("Please select a valid mood.", "warning")
-            selected_mood = ""
-
         except Exception as e:
-            print("AI Discovery Error:", e)
-            flash("Could not generate recommendations.", "danger")
+            print("AI Discovery TMDb Error:", e)
+            flash("Could not fetch movies for this mood from TMDb.", "danger")
 
     return render_template(
         "ai_discovery.html",
-        moods=mood_engine.get_mood_list(),
+        moods=["romantic", "sad", "action", "funny", "mind_blowing", "relaxing"],
         selected_mood=selected_mood,
         recommendations=recommendations,
         current_mood_info=current_mood_info

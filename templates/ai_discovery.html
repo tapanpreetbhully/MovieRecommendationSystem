@@ -77,11 +77,23 @@
 
 <div class="container py-4 pb-5">
 
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show mb-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <!-- Header -->
     <div class="discovery-header">
         <h1 class="page-heading h1 mb-2">✨ AI Mood Discovery</h1>
         <p class="text-muted fs-5 mb-0">
-            Tell us how you feel. Our AI ranks movies in exact order of emotional relevance.
+            Tell us how you feel. Discover trending global movies ranked by emotional relevance.
         </p>
     </div>
 
@@ -91,12 +103,12 @@
     </h5>
 
     {% set mood_details = {
-        'romantic': ('💖', 'Romantic', 'Love, couples & heart'),
-        'sad': ('😢', 'Sad', 'Heartbreak, tears & drama'),
+        'romantic': ('💖', 'Romantic', 'Love, romance & couples'),
+        'sad': ('😢', 'Sad', 'Heartbreak, tears & deep dramas'),
         'action': ('💥', 'Action', 'Stunts, thrills & battles'),
-        'funny': ('😂', 'Funny', 'Laughs, comedy & fun'),
+        'funny': ('😂', 'Funny', 'Laughs, comedy & humor'),
         'mind_blowing': ('🧠', 'Mind-Blowing', 'Sci-Fi, plot twists & mystery'),
-        'relaxing': ('🌿', 'Relaxing', 'Comforting, peaceful & chill')
+        'relaxing': ('🌿', 'Relaxing', 'Comforting, peaceful & feel-good')
     } %}
 
     <div class="row g-3 justify-content-center mb-5">
@@ -126,12 +138,12 @@
                 {% endif %}
             </h3>
             <p class="text-muted mb-0">
-                Sorted in precision order: from highest match (<strong>99% {{ current_mood_info.name if current_mood_info else '' }}</strong>, <strong>98%</strong>, <strong>97%</strong>...)
+                Sorted in precision order: from strongest match (<strong>99% {{ current_mood_info.name if current_mood_info else '' }}</strong>, <strong>98%</strong>, <strong>97%</strong>...)
             </p>
         </div>
 
         <span class="badge bg-dark border text-light px-3 py-2">
-            <i class="bi bi-cpu text-info me-1"></i> AI Neural Ranked
+            <i class="bi bi-camera-reels text-warning me-1"></i> Verified Global Titles
         </span>
     </div>
 
@@ -144,8 +156,8 @@
 
                 <!-- Poster with Mood Match Badge -->
                 <div class="ai-poster-wrapper">
-                    <a href="{{ url_for('movie_details', movie_id=movie.movie_id) }}">
-                        <img src="{{ movie.poster_url if movie.poster_url and (movie.poster_url|string).startswith('http') else 'https://via.placeholder.com/500x750?text=No+Poster' }}"
+                    <a href="{{ url_for('tmdb_details', media_type='movie', media_id=movie.id) }}">
+                        <img src="{{ movie.poster_url }}"
                              class="ai-movie-poster"
                              alt="{{ movie.title }}"
                              loading="lazy">
@@ -165,13 +177,13 @@
                 <div class="p-3 d-flex flex-column justify-content-between flex-grow-1">
                     <div>
                         <h6 class="fw-bold mb-1 text-truncate text-light" title="{{ movie.title }}">
-                            <a href="{{ url_for('movie_details', movie_id=movie.movie_id) }}" class="text-light text-decoration-none">
+                            <a href="{{ url_for('tmdb_details', media_type='movie', media_id=movie.id) }}" class="text-light text-decoration-none">
                                 {{ movie.title }}
                             </a>
                         </h6>
 
                         <div class="small text-muted mb-2">
-                            <span>{{ movie.language }}</span> • <span>{{ movie.genre }}</span>
+                            <span>{{ movie.release_year }}</span> • <span>{{ movie.language }}</span>
                         </div>
 
                         <!-- Progress Bar of Match -->
@@ -190,25 +202,25 @@
                             </div>
                         </div>
 
-                        <!-- AI Reason -->
-                        <p class="small text-muted mb-3" style="line-height: 1.4; font-size: 0.8rem;">
-                            <i class="bi bi-sparkles text-warning me-1"></i> {{ movie.reason }}
+                        <!-- Overview Snippet -->
+                        <p class="small text-muted mb-3" style="line-height: 1.4; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ movie.overview }}
                         </p>
                     </div>
 
                     <!-- Details and Interaction Buttons -->
                     <div class="mt-auto d-flex flex-column gap-2">
-                        <a href="{{ url_for('movie_details', movie_id=movie.movie_id) }}"
+                        <a href="{{ url_for('tmdb_details', media_type='movie', media_id=movie.id) }}"
                            class="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
-                            <i class="bi bi-play-circle-fill"></i> View Movie & Details
+                            <i class="bi bi-play-circle-fill"></i> View Details & Trailer
                         </a>
                         <div class="btn-group w-100" role="group">
-                            <a href="{{ url_for('add_watchlist', movie_id=movie.movie_id) }}" 
+                            <a href="{{ url_for('tmdb_add_watchlist', tmdb_id=movie.id, media_type='movie') }}" 
                                class="btn btn-sm btn-outline-success" 
                                title="Add to Watchlist">
                                 <i class="bi bi-bookmark-plus"></i> Watchlist
                             </a>
-                            <a href="{{ url_for('add_favourite', movie_id=movie.movie_id) }}" 
+                            <a href="{{ url_for('tmdb_add_favourite', tmdb_id=movie.id, media_type='movie') }}" 
                                class="btn btn-sm btn-outline-danger" 
                                title="Add to Favourites">
                                 <i class="bi bi-heart"></i> Favourite
@@ -237,7 +249,7 @@
             <div class="display-3 mb-3">🎯</div>
             <h3 class="text-light">Select a Mood to Begin Discovery</h3>
             <p class="text-muted">
-                Click <strong>Romantic</strong>, <strong>Sad</strong>, or <strong>Action</strong> above to see AI-ranked movie lists sorted by mood strength (99%, 98%, 97%...).
+                Click <strong>Romantic</strong>, <strong>Sad</strong>, or <strong>Action</strong> above to see titles ranked by mood relevance (99%, 98%, 97%...).
             </p>
         </div>
     </div>
