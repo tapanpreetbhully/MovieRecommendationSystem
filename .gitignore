@@ -1,0 +1,7 @@
+# Local secrets and environment configuration
+.env
+
+# Python bytecode and virtual environments
+__pycache__/
+*.py[cod]
+venv/

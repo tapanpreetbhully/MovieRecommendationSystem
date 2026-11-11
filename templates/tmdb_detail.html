@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.title }} — Movie Details & Trailer{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show mb-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ url_for('tmdb_explore', type=item.media_type) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Explore
+        </a>
+        <span class="badge bg-dark border text-light"><i class="bi bi-badge-4k-fill text-warning me-1"></i> 4K Ultra HD</span>
+    </div>
+
+    <!-- Main Movie Details Card -->
+    <div class="card shadow-lg border-0 p-4 mb-4">
+        <div class="row g-4">
+
+            <!-- Left: Poster Column -->
+            <div class="col-12 col-md-4 text-center">
+                <img src="{{ item.poster_url }}" 
+                     class="img-fluid rounded shadow-lg border w-100" 
+                     alt="{{ item.title }}" 
+                     style="max-height: 520px; object-fit: cover;">
+
+                <!-- User Action Buttons: Watchlist & Favourite -->
+                <div class="d-grid gap-2 mt-3">
+                    <a href="{{ url_for('tmdb_add_favourite', tmdb_id=item.id, media_type=item.media_type) }}" 
+                       class="btn btn-outline-danger d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-heart-fill"></i> Add to Favourites
+                    </a>
+                    <a href="{{ url_for('tmdb_add_watchlist', tmdb_id=item.id, media_type=item.media_type) }}" 
+                       class="btn btn-outline-success d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-bookmark-plus-fill"></i> Add to Watchlist
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Details Column -->
+            <div class="col-12 col-md-8">
+
+                <!-- Title & Tagline -->
+                <h1 class="page-heading h1 mb-1">{{ item.title }}</h1>
+                {% if item.tagline %}
+                    <p class="text-muted fst-italic mb-3">"{{ item.tagline }}"</p>
+                {% endif %}
+
+                <!-- Emotional Mood & Category Badges -->
+                <div class="mb-3">
+                    <span class="small text-muted me-2">Movie Category & Mood:</span>
+                    {% for mood in item.moods %}
+                        <span class="badge bg-{{ mood.color }} fs-6 me-1 px-3 py-2 shadow-sm">
+                            {{ mood.emoji }} {{ mood.name }}
+                        </span>
+                    {% endfor %}
+                </div>
+
+                <!-- Key Metrics Badges -->
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <span class="badge bg-warning text-dark fs-6 py-2 px-3">
+                        <i class="bi bi-star-fill"></i> {{ item.rating }} / 10 <small class="text-muted">({{ item.vote_count }} votes)</small>
+                    </span>
+                    <span class="badge bg-primary fs-6 py-2 px-3">
+                        <i class="bi bi-translate"></i> {{ item.language }}
+                    </span>
+                    <span class="badge bg-secondary fs-6 py-2 px-3">
+                        <i class="bi bi-calendar3"></i> {{ item.release_year }}
+                    </span>
+                    {% if item.runtime and item.runtime != 'N/A' %}
+                        <span class="badge bg-dark border fs-6 py-2 px-3">
+                            <i class="bi bi-clock"></i> {{ item.runtime }}
+                        </span>
+                    {% endif %}
+                    {% if item.media_type == 'tv' %}
+                        <span class="badge bg-info text-dark fs-6 py-2 px-3">
+                            <i class="bi bi-tv"></i> {{ item.seasons_count }} Seasons ({{ item.episodes_count }} Episodes)
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Genres -->
+                {% if item.genres %}
+                <div class="mb-3">
+                    <strong>Genres:</strong>
+                    {% for genre in item.genres %}
+                        <span class="badge bg-dark border text-light me-1">{{ genre }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Cast & Crew -->
+                <div class="card p-3 my-3 bg-transparent border">
+                    <p class="mb-1">
+                        <strong><i class="bi bi-camera-reels text-primary"></i> Director:</strong> 
+                        <span class="text-light">{{ item.director or 'Not available' }}</span>
+                    </p>
+                    <p class="mb-0">
+                        <strong><i class="bi bi-people text-info"></i> Star Cast / Actors:</strong> 
+                        <span class="text-light">{{ item.actors or 'Not available' }}</span>
+                    </p>
+                </div>
+
+                <!-- Synopsis / Description -->
+                <h5 class="fw-bold text-light mt-3">
+                    <i class="bi bi-card-text text-warning"></i> Description & Storyline
+                </h5>
+                <p class="text-muted" style="line-height: 1.7; font-size: 1.05rem;">
+                    {{ item.overview }}
+                </p>
+
+                <!-- Rate this Movie Card -->
+                <div class="card p-3 mt-4 border shadow-sm">
+                    <h5 class="card-title mb-2 text-warning">
+                        <i class="bi bi-star-fill"></i> Rate This Title
+                    </h5>
+                    <p class="small text-muted mb-2">
+                        Your rating helps personalize your <strong>AI Taste DNA</strong>!
+                    </p>
+                    <form action="{{ url_for('tmdb_rate_movie', tmdb_id=item.id, media_type=item.media_type) }}" method="POST" class="d-flex align-items-center gap-2">
+                        <select name="rating" class="form-select form-select-sm" style="max-width: 160px;" required>
+                            <option value="">Select Stars</option>
+                            <option value="5">⭐⭐⭐⭐⭐ (5 - Masterpiece)</option>
+                            <option value="4">⭐⭐⭐⭐ (4 - Great)</option>
+                            <option value="3">⭐⭐⭐ (3 - Good)</option>
+                            <option value="2">⭐⭐ (2 - Mediocre)</option>
+                            <option value="1">⭐ (1 - Poor)</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            Submit Rating
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Official YouTube Trailer Section -->
+        <div class="mt-5 pt-4 border-top">
+            <h4 class="fw-bold mb-3 text-danger d-flex align-items-center gap-2">
+                <i class="bi bi-youtube"></i> Official Trailer
+            </h4>
+            {% if item.trailer_key %}
+                <div class="ratio ratio-16x9 rounded overflow-hidden shadow-lg border">
+                    <iframe src="https://www.youtube.com/embed/{{ item.trailer_key }}?rel=0&autoplay=0" 
+                            title="{{ item.title }} Official Trailer" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen></iframe>
+                </div>
+            {% else %}
+                <div class="alert alert-secondary d-flex align-items-center gap-2">
+                    <i class="bi bi-info-circle fs-5"></i>
+                    <span>Official YouTube trailer is not available on TMDb for this title.</span>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

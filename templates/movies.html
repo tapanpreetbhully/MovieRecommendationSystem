@@ -4,9 +4,12 @@
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container py-5">
 
-    <h2 class="mb-4">🎬 Explore Movies</h2>
+    <div class="mb-4">
+        <span class="text-info text-uppercase fw-semibold small">Movie library</span>
+        <h1 class="page-heading h2 mt-1 mb-0">Explore Movies</h1>
+    </div>
 
     <!-- Search and Filters -->
     <form method="GET" action="{{ url_for('movie_list') }}"

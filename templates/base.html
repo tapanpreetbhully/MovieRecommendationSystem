@@ -19,8 +19,19 @@
     >
 
     <style>
+        :root {
+            --mm-bg: #0b1020;
+            --mm-surface: #141c31;
+            --mm-surface-hover: #19243e;
+            --mm-border: #2a3a5d;
+            --mm-text: #edf2ff;
+            --mm-muted: #aebbd7;
+            --mm-accent: #5b7cfa;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background: var(--mm-bg);
+            color: var(--mm-text);
             font-family: Arial, sans-serif;
             min-height: 100vh;
             display: flex;
@@ -37,7 +48,7 @@
         }
 
         .navbar .nav-link:hover {
-            color: #ffc107;
+            color: #9db1ff;
         }
 
         .hero {
@@ -61,12 +72,115 @@
             flex: 1;
         }
 
+        /* Shared MovieMate dark interface for feature pages. */
+        main .container {
+            position: relative;
+        }
+
+        .card,
+        .card.card-body {
+            background: var(--mm-surface);
+            border: 1px solid var(--mm-border) !important;
+            color: var(--mm-text);
+            border-radius: .85rem;
+        }
+
+        .card.shadow,
+        .card.shadow-sm,
+        .card.shadow-lg {
+            box-shadow: 0 .8rem 2.25rem rgba(0, 0, 0, .22) !important;
+        }
+
+        .card:not(.movie-card) {
+            transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .card:not(.movie-card):hover {
+            border-color: #5c74b7 !important;
+            box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, .3) !important;
+        }
+
+        .text-muted,
+        .text-secondary {
+            color: var(--mm-muted) !important;
+        }
+
+        .form-control,
+        .form-select {
+            background: #0e1528;
+            border-color: #384b77;
+            color: var(--mm-text);
+        }
+
+        .form-control::placeholder {
+            color: #8391b1;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: #101a31;
+            color: var(--mm-text);
+            border-color: #7692ed;
+            box-shadow: 0 0 0 .25rem rgba(91, 124, 250, .2);
+        }
+
+        .form-select option {
+            background: #101a31;
+            color: var(--mm-text);
+        }
+
+        .btn-primary {
+            background: var(--mm-accent);
+            border-color: var(--mm-accent);
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background: #4969e7;
+            border-color: #4969e7;
+        }
+
+        .btn-dark {
+            background: #202c4a;
+            border-color: #3d5284;
+        }
+
+        .btn-outline-secondary {
+            border-color: #7181a7;
+            color: #cbd6f0;
+        }
+
+        .btn-outline-secondary:hover {
+            background: #7181a7;
+            color: #0b1020;
+        }
+
+        .alert {
+            border-color: var(--mm-border);
+        }
+
+        hr,
+        .border-bottom {
+            border-color: var(--mm-border) !important;
+        }
+
+        a:not(.btn):not(.navbar-brand):not(.nav-link) {
+            color: #9db1ff;
+        }
+
+        .page-heading {
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: -.025em;
+        }
+
         footer {
-            margin-top: 60px;
+            margin-top: 0;
             padding: 20px;
             text-align: center;
-            background: #212529;
-            color: white;
+            background: #080c17;
+            border-top: 1px solid #1f2b48;
+            color: var(--mm-muted);
         }
     </style>
 </head>
@@ -99,13 +213,32 @@
             <div class="collapse navbar-collapse" id="movieMateNavbar">
                 <ul class="navbar-nav ms-auto align-items-lg-center">
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="/movies">
-                            <i class="bi bi-film"></i> Movies
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('tmdb_explore') }}">
+                                <i class="bi bi-film"></i> Movies & Series
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="{{ url_for('ai_discovery') }}">
+                                <i class="bi bi-stars"></i> AI Discovery
+                            </a>
+                        </li>
 
                     {% if session.get("user_id") %}
+
+                        <li class="nav-item">
+                            <a class="nav-link text-info" href="{{ url_for('taste_dna') }}">
+                                <i class="bi bi-fingerprint"></i>  My Taste DNA
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link text-warning"href="{{ url_for('ai_insights') }}">
+                                <i class="bi bi-stars"></i> My AI Insights
+                            </a>
+                        </li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="/personalized-recommendations">

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}
+My AI Taste DNA - MovieMate
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+    <!-- PAGE HEADER -->
+    <div class="text-center mb-5">
+        <h1 class="page-heading">🧬 My AI Taste DNA</h1>
+        <p class="text-muted fs-5">
+            Discover your unique movie personality and emotional taste profile.
+        </p>
+    </div>
+
+    <!-- PERSONALITY CARD -->
+    <div class="card shadow-lg border-0 mb-4 text-center">
+        <div class="card-body p-5">
+            <h6 class="text-uppercase text-muted fw-bold tracking-wider mb-2">YOUR MOVIE PERSONALITY</h6>
+            <h1 class="display-4 fw-bold text-primary mb-2">
+                {{ profile.personality }}
+            </h1>
+            <p class="text-muted mb-0">
+                Calculated dynamically from your rated movies, watchlist, and favourites.
+            </p>
+        </div>
+    </div>
+
+    <!-- ACTIVITY STATISTICS -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card-body">
+                    <h2 class="text-warning fw-bold">⭐ {{ profile.total_ratings }}</h2>
+                    <p class="text-muted mb-0">Total Ratings</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card-body">
+                    <h2 class="text-danger fw-bold">❤️ {{ profile.total_favourites }}</h2>
+                    <p class="text-muted mb-0">Favourites</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card-body">
+                    <h2 class="text-success fw-bold">🔖 {{ profile.total_watchlist }}</h2>
+                    <p class="text-muted mb-0">Watchlist</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card-body">
+                    <h2 class="text-info fw-bold">{{ profile.average_rating }} / 5</h2>
+                    <p class="text-muted mb-0">Average Rating</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOOD & EMOTIONAL CATEGORY BREAKDOWN -->
+    {% if profile.mood_breakdown %}
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-body p-4">
+            <h3 class="fw-bold mb-1">🎭 Emotional & Category DNA</h3>
+            <p class="text-muted mb-4">
+                What types of emotions drive your movie choices (Romantic, Sad/Emotional, Funny, Action, Mind-Bending):
+            </p>
+
+            <div class="row g-3">
+                {% for mood in profile.mood_breakdown %}
+                <div class="col-12 col-md-6">
+                    <div class="p-3 border rounded bg-dark bg-opacity-25">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold">
+                                {{ mood.emoji }} {{ mood.name }}
+                            </span>
+                            <span class="badge bg-{{ mood.color }}">{{ mood.percentage }}% ({{ mood.count }} titles)</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-{{ mood.color }}" 
+                                 role="progressbar" 
+                                 style="width: {{ mood.percentage }}%;" 
+                                 aria-valuenow="{{ mood.percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- TASTE PREFERENCES (GENRES & LANGUAGES) -->
+    <div class="row g-4">
+
+        <!-- GENRES -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">🎬 Top Genres</h4>
+                    {% for name, count in profile.top_genres %}
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>{{ name }}</span>
+                            <strong class="text-primary">{{ count }} movies</strong>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No genre activity yet. Start rating or adding movies!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- LANGUAGES -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">🌐 Preferred Languages</h4>
+                    {% for name, count in profile.top_languages %}
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>{{ name }}</span>
+                            <strong class="text-info">{{ count }} movies</strong>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No language activity yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- DIRECTORS -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">🎥 Favourite Directors</h4>
+                    {% for name, count in profile.top_directors %}
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>{{ name }}</span>
+                            <strong class="text-secondary">{{ count }} movies</strong>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No director activity recorded yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTORS -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">⭐ Top Actors</h4>
+                    {% for name, count in profile.top_actors %}
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>{{ name }}</span>
+                            <strong class="text-secondary">{{ count }} movies</strong>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No actors activity recorded yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

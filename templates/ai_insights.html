@@ -1,0 +1,107 @@
+
+{% extends "base.html" %}
+
+{% block title %}My AI Insights - MovieMate{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Page Heading -->
+    <div class="text-center mb-5">
+        <h1 class="page-heading">
+            <i class="bi bi-stars text-warning"></i>
+            Your Personalized AI Insights
+        </h1>
+
+        <p class="text-muted">
+            Discover what your movie preferences reveal about you.
+        </p>
+    </div>
+
+    <!-- Personality Card -->
+    <div class="card shadow-lg border-0 rounded-4 mb-5"
+         style="background: linear-gradient(135deg, #172554, #312e81); color: white;">
+
+        <div class="card-body text-center p-5">
+            <div style="font-size: 55px;">🧬</div>
+
+            <h5 class="mt-3">Your Movie Personality</h5>
+
+            <h2 class="fw-bold text-warning">
+                {{ result.personality }}
+            </h2>
+
+            <p class="mb-0">
+                Your personal movie taste, understood by MovieMate AI.
+            </p>
+        </div>
+    </div>
+
+    <!-- Insights Cards -->
+    <div class="row g-4">
+
+        {% for insight in result.insights %}
+
+        <div class="col-md-6 col-lg-4">
+
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+
+                <div class="card-body p-4">
+
+                    <div class="mb-3" style="font-size: 35px;">
+                        {{ insight.icon }}
+                    </div>
+
+                    <h5 class="fw-bold">
+                        {{ insight.title }}
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        {{ insight.description }}
+                    </p>
+
+                    {% if insight.suggested_genres %}
+
+                    <div class="mt-3">
+                        <h6 class="fw-bold">Explore these genres:</h6>
+
+                        {% for genre in insight.suggested_genres %}
+                            <span class="badge bg-primary me-1 mb-1">
+                                {{ genre }}
+                            </span>
+                        {% endfor %}
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mt-5">
+
+        <a href="{{ url_for('taste_dna') }}"
+           class="btn btn-outline-primary rounded-pill px-4 me-2">
+            <i class="bi bi-fingerprint"></i>
+            View Taste DNA
+        </a>
+
+        <a href="{{ url_for('personalized_recommendations') }}"
+           class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-camera-reels"></i>
+            Explore Recommendations
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

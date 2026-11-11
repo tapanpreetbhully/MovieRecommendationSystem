@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}AI Mood Discovery — MovieMate{% endblock %}
+
+{% block content %}
+<style>
+    .discovery-header {
+        text-align: center;
+        padding: 40px 15px 25px;
+    }
+
+    .mood-card {
+        border: 1px solid #2a3a5d;
+        border-radius: 16px;
+        padding: 20px 12px;
+        text-align: center;
+        background: #141c31;
+        color: #edf2ff;
+        height: 100%;
+        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        text-decoration: none;
+        display: block;
+    }
+
+    .mood-card:hover,
+    .mood-card.active {
+        transform: translateY(-6px);
+        border-color: #5b7cfa !important;
+        box-shadow: 0 10px 30px rgba(91, 124, 250, 0.35) !important;
+        background: #18233f;
+    }
+
+    .mood-emoji {
+        font-size: 38px;
+        margin-bottom: 8px;
+    }
+
+    .ai-movie-card {
+        background: #141c31;
+        color: #edf2ff;
+        border: 1px solid #2a3a5d;
+        border-radius: 14px;
+        overflow: hidden;
+        height: 100%;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .ai-movie-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+        border-color: #5c74b7 !important;
+    }
+
+    .ai-poster-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ai-movie-poster {
+        width: 100%;
+        height: 310px;
+        object-fit: cover;
+        background: #090e1a;
+    }
+
+    .match-badge-pill {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+</style>
+
+<div class="container py-4 pb-5">
+
+    <!-- Header -->
+    <div class="discovery-header">
+        <h1 class="page-heading h1 mb-2">✨ AI Mood Discovery</h1>
+        <p class="text-muted fs-5 mb-0">
+            Tell us how you feel. Our AI ranks movies in exact order of emotional relevance.
+        </p>
+    </div>
+
+    <!-- Mood Selector Row -->
+    <h5 class="fw-bold text-center mb-3 text-light">
+        <i class="bi bi-heart-pulse text-danger me-1"></i> Choose Your Current Vibe:
+    </h5>
+
+    {% set mood_details = {
+        'romantic': ('💖', 'Romantic', 'Love, couples & heart'),
+        'sad': ('😢', 'Sad', 'Heartbreak, tears & drama'),
+        'action': ('💥', 'Action', 'Stunts, thrills & battles'),
+        'funny': ('😂', 'Funny', 'Laughs, comedy & fun'),
+        'mind_blowing': ('🧠', 'Mind-Blowing', 'Sci-Fi, plot twists & mystery'),
+        'relaxing': ('🌿', 'Relaxing', 'Comforting, peaceful & chill')
+    } %}
+
+    <div class="row g-3 justify-content-center mb-5">
+        {% for mood in moods %}
+        {% set info = mood_details.get(mood, ('🎬', mood.title(), 'Movies for your mood')) %}
+        <div class="col-6 col-sm-4 col-md-2">
+            <a href="{{ url_for('ai_discovery', mood=mood) }}" 
+               class="mood-card {% if selected_mood == mood or (selected_mood == 'emotional' and mood == 'sad') %}active{% endif %}">
+                <div class="mood-emoji">{{ info[0] }}</div>
+                <h6 class="fw-bold mb-1 text-light">{{ info[1] }}</h6>
+                <small class="text-muted d-block" style="font-size: 0.75rem;">{{ info[2] }}</small>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Recommendations Section -->
+    {% if selected_mood %}
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h3 class="page-heading h3 mb-1">
+                {% if current_mood_info %}
+                    {{ current_mood_info.emoji }} Top {{ current_mood_info.name }} Movies
+                {% else %}
+                    🎬 Top Movies for You
+                {% endif %}
+            </h3>
+            <p class="text-muted mb-0">
+                Sorted in precision order: from highest match (<strong>99% {{ current_mood_info.name if current_mood_info else '' }}</strong>, <strong>98%</strong>, <strong>97%</strong>...)
+            </p>
+        </div>
+
+        <span class="badge bg-dark border text-light px-3 py-2">
+            <i class="bi bi-cpu text-info me-1"></i> AI Neural Ranked
+        </span>
+    </div>
+
+    {% if recommendations %}
+
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-4">
+        {% for movie in recommendations %}
+        <div class="col">
+            <div class="ai-movie-card d-flex flex-column">
+
+                <!-- Poster with Mood Match Badge -->
+                <div class="ai-poster-wrapper">
+                    <a href="{{ url_for('movie_details', movie_id=movie.movie_id) }}">
+                        <img src="{{ movie.poster_url if movie.poster_url and (movie.poster_url|string).startswith('http') else 'https://via.placeholder.com/500x750?text=No+Poster' }}"
+                             class="ai-movie-poster"
+                             alt="{{ movie.title }}"
+                             loading="lazy">
+                    </a>
+
+                    <!-- Match percentage badge: 99% Romantic, 98% Sad, etc. -->
+                    <span class="match-badge-pill {% if movie.match_percentage >= 95 %}bg-danger text-white{% elif movie.match_percentage >= 90 %}bg-primary text-white{% else %}bg-info text-dark{% endif %}">
+                        {{ movie.mood_emoji }} {{ movie.mood_label }}
+                    </span>
+
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-75 border text-warning fw-bold">
+                        ⭐ {{ movie.rating }}
+                    </span>
+                </div>
+
+                <!-- Card Body -->
+                <div class="p-3 d-flex flex-column justify-content-between flex-grow-1">
+                    <div>
+                        <h6 class="fw-bold mb-1 text-truncate text-light" title="{{ movie.title }}">
+                            <a href="{{ url_for('movie_details', movie_id=movie.movie_id) }}" class="text-light text-decoration-none">
+                                {{ movie.title }}
+                            </a>
+                        </h6>
+
+                        <div class="small text-muted mb-2">
+                            <span>{{ movie.language }}</span> • <span>{{ movie.genre }}</span>
+                        </div>
+
+                        <!-- Progress Bar of Match -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small text-muted mb-1" style="font-size: 0.76rem;">
+                                <span>Mood Relevance</span>
+                                <strong class="text-light">{{ movie.match_percentage }}%</strong>
+                            </div>
+                            <div class="progress" style="height: 6px; background: #0c1220;">
+                                <div class="progress-bar {% if movie.match_percentage >= 95 %}bg-danger{% elif movie.match_percentage >= 90 %}bg-primary{% else %}bg-info{% endif %}" 
+                                     role="progressbar" 
+                                     style="width: {{ movie.match_percentage }}%;" 
+                                     aria-valuenow="{{ movie.match_percentage }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <!-- AI Reason -->
+                        <p class="small text-muted mb-3" style="line-height: 1.4; font-size: 0.8rem;">
+                            <i class="bi bi-sparkles text-warning me-1"></i> {{ movie.reason }}
+                        </p>
+                    </div>
+
+                    <!-- Details and Interaction Buttons -->
+                    <div class="mt-auto d-flex flex-column gap-2">
+                        <a href="{{ url_for('movie_details', movie_id=movie.movie_id) }}"
+                           class="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
+                            <i class="bi bi-play-circle-fill"></i> View Movie & Details
+                        </a>
+                        <div class="btn-group w-100" role="group">
+                            <a href="{{ url_for('add_watchlist', movie_id=movie.movie_id) }}" 
+                               class="btn btn-sm btn-outline-success" 
+                               title="Add to Watchlist">
+                                <i class="bi bi-bookmark-plus"></i> Watchlist
+                            </a>
+                            <a href="{{ url_for('add_favourite', movie_id=movie.movie_id) }}" 
+                               class="btn btn-sm btn-outline-danger" 
+                               title="Add to Favourites">
+                                <i class="bi bi-heart"></i> Favourite
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="alert alert-secondary text-center py-4">
+        <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
+        No matching movies found for this mood. Try selecting another mood above!
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Initial Prompt -->
+    <div class="text-center py-5 my-3">
+        <div class="card p-5 border-0 bg-transparent">
+            <div class="display-3 mb-3">🎯</div>
+            <h3 class="text-light">Select a Mood to Begin Discovery</h3>
+            <p class="text-muted">
+                Click <strong>Romantic</strong>, <strong>Sad</strong>, or <strong>Action</strong> above to see AI-ranked movie lists sorted by mood strength (99%, 98%, 97%...).
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

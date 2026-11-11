@@ -6,7 +6,7 @@ Register - MovieMate
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container py-5">
 
     <div class="row justify-content-center">
 
@@ -16,9 +16,11 @@ Register - MovieMate
 
                 <div class="card-body p-4">
 
-                    <h2 class="text-center mb-4">
-                        Create Account 👤
+                    <h2 class="page-heading text-center mb-2">
+                        Create your account
                     </h2>
+
+                    <p class="text-muted text-center mb-4">Save favourites and get recommendations tailored to you.</p>
 
                     <form method="POST">
 
@@ -77,7 +79,7 @@ Register - MovieMate
                     <p class="text-center mt-3 mb-0">
                         Already have an account?
 
-                        <a href="/login">
+                        <a href="{{ url_for('login') }}">
                             Login
                         </a>
                     </p>

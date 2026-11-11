@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}
@@ -13,11 +12,23 @@
 
         <div class="col-md-8">
 
-            <h1>{{ movie.title }}</h1>
+            <h1 class="page-heading">{{ movie.title }}</h1>
 
             <p class="text-muted">
                 {{ movie.release_year }} • {{ movie.language }}
             </p>
+
+            <!-- Movie Category & Emotional Mood Badges -->
+            {% if moods %}
+            <div class="mb-3">
+                <span class="small text-muted me-2">Movie Category & Mood:</span>
+                {% for mood in moods %}
+                    <span class="badge bg-{{ mood.color }} fs-6 me-1 px-3 py-2 shadow-sm">
+                        {{ mood.emoji }} {{ mood.name }}
+                    </span>
+                {% endfor %}
+            </div>
+            {% endif %}
 
             <hr>
 
@@ -42,10 +53,10 @@
             </p>
 
             <h4 class="mt-4">
-                Description
+                Description & Storyline
             </h4>
 
-            <p>
+            <p style="line-height: 1.7; font-size: 1.05rem;">
                 {{ movie.description }}
             </p>
 
@@ -53,13 +64,13 @@
             <div class="card shadow-sm mt-4 mb-4">
                 <div class="card-body">
 
-                    <h4 class="card-title">
-                        <i class="bi bi-star-fill text-warning"></i>
+                    <h4 class="card-title text-warning">
+                        <i class="bi bi-star-fill"></i>
                         Rate This Movie
                     </h4>
 
                     <p class="text-muted">
-                        How many stars would you give this movie?
+                        How many stars would you give this movie? (Shapes your AI Taste DNA)
                     </p>
 
                     {% if session.get("user_id") %}
@@ -90,6 +101,7 @@
                                     name="rating"
                                     id="rating"
                                     class="form-select"
+                                    style="max-width: 250px;"
                                     required
                                 >
 
@@ -97,27 +109,27 @@
 
                                     <option value="1"
                                         {% if user_rating == 1 %}selected{% endif %}>
-                                        ⭐ 1 Star
+                                        ⭐ 1 Star (Poor)
                                     </option>
 
                                     <option value="2"
                                         {% if user_rating == 2 %}selected{% endif %}>
-                                        ⭐⭐ 2 Stars
+                                        ⭐⭐ 2 Stars (Mediocre)
                                     </option>
 
                                     <option value="3"
                                         {% if user_rating == 3 %}selected{% endif %}>
-                                        ⭐⭐⭐ 3 Stars
+                                        ⭐⭐⭐ 3 Stars (Good)
                                     </option>
 
                                     <option value="4"
                                         {% if user_rating == 4 %}selected{% endif %}>
-                                        ⭐⭐⭐⭐ 4 Stars
+                                        ⭐⭐⭐⭐ 4 Stars (Great)
                                     </option>
 
                                     <option value="5"
                                         {% if user_rating == 5 %}selected{% endif %}>
-                                        ⭐⭐⭐⭐⭐ 5 Stars
+                                        ⭐⭐⭐⭐⭐ 5 Stars (Masterpiece)
                                     </option>
 
                                 </select>
@@ -170,7 +182,7 @@
                         href="{{ url_for('add_watchlist', movie_id=movie_id) }}"
                         class="btn btn-success"
                     >
-                        📋 Add to Watchlist
+                        🔖 Add to Watchlist
                     </a>
 
                     <a
@@ -182,21 +194,41 @@
 
                 {% else %}
 
-                    <a href="{{ url_for('login') }}" class="btn btn-secondary">
-                        🔐 Login to Add Watchlist
+                    <a
+                        href="{{ url_for('login') }}"
+                        class="btn btn-outline-success"
+                    >
+                        🔖 Login to Add to Watchlist
                     </a>
 
-                    <a href="{{ url_for('login') }}" class="btn btn-secondary">
-                        🔐 Login to Add Favourite
+                    <a
+                        href="{{ url_for('login') }}"
+                        class="btn btn-outline-danger"
+                    >
+                        ❤️ Login to Add to Favourites
                     </a>
 
                 {% endif %}
 
-                <a href="{{ url_for('movie_list') }}" class="btn btn-dark">
-                    ← Back to Movies
-                </a>
-
             </div>
+
+        </div>
+
+        <!-- Poster Column -->
+        <div class="col-md-4 text-center">
+
+            {% if movie.poster_url %}
+                <img
+                    src="{{ movie.poster_url }}"
+                    alt="{{ movie.title }}"
+                    class="img-fluid rounded shadow-lg border"
+                    style="max-height: 520px; object-fit: cover;"
+                >
+            {% else %}
+                <div class="card p-5 text-center text-muted">
+                    No Poster Available
+                </div>
+            {% endif %}
 
         </div>
 
